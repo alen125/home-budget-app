@@ -19,8 +19,9 @@ class NotFoundExceptionListener
             return;
         }
         $request = $event->getRequest();
+        $routeParams = $request->attributes->get('_route_params');
 
-        if ($request->attributes->get('_route_params') === []) {
+        if ([] === $routeParams || null === $routeParams) {
             return;
         }
 
