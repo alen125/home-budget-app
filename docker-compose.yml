@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: home_budget_app_php
+    user: "1000:1000"
+    restart: unless-stopped
+    volumes:
+      - ./backend:/var/www/symfony:cached
+    depends_on:
+      - db
+    environment:
+      - APP_ENV=${APP_ENV}
+      - APP_SECRET=${APP_SECRET}
+      - DATABASE_URL=${DATABASE_URL}
+    networks:
+      - home_budget_app_net
+
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: home_budget_app_nginx
+    restart: unless-stopped
+    ports:
+      # Maps a configurable host port (from .env) to port 80 in the container.
+      # You can access the app at http://localhost:${NGINX_HOST_PORT}
+      - "${NGINX_HOST_PORT:-80}:80"
+    volumes:
+      # Mounts the application code to serve static assets.
+      - ./backend:/var/www/symfony:cached
+      # Mounts the custom Nginx configuration.
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - php
+    networks:
+      - home_budget_app_net
+
+  db:
+    image: postgres:16-alpine
+    container_name: home_budget_app_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data:cached
+    ports:
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
+    networks:
+      - home_budget_app_net
+
+  redoc:
+    image: redocly/redoc
+    container_name: home_budget_app_redoc
+    ports:
+      - "${REDOC_PORT:-80}:80"
+    volumes:
+      - ./docs/openapi.yaml:/usr/share/nginx/html/openapi.yaml:ro
+    environment:
+      - SPEC_URL=openapi.yaml
+    restart: unless-stopped
+
+networks:
+  home_budget_app_net:
+    driver: bridge
+
+volumes:
+  db_data:

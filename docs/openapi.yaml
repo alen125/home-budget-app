@@ -1,0 +1,440 @@
+openapi: 3.1.0
+info:
+  title: Home Budget App API
+  version: 1.0.0
+  description: >
+    API for authentication, budget overview, expenses and expense categories.
+
+servers:
+  - url: http://localhost:5100
+
+tags:
+  - name: Authentication
+  - name: Budget
+  - name: Expense
+  - name: Expense Category
+
+paths:
+  /api/login:
+    post:
+      tags: [Authentication]
+      summary: Login and receive a JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+  /api/register:
+    post:
+      tags: [Authentication]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterDTO'
+      responses:
+        '201':
+          description: User registered
+        '400':
+          description: Validation error
+
+  /api/budget:
+    get:
+      tags: [Budget]
+      summary: Get aggregated budget and expense data
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [custom, currentMonth, lastMonth, currentQuarter]
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Aggregated budget result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetResponse'
+
+  /api/expenses:
+    get:
+      tags: [Expense]
+      summary: List all expenses with pagination, filters, and sorting
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: categoryId
+          in: query
+          schema:
+            type: integer
+            nullable: true
+        - name: priceMin
+          in: query
+          schema:
+            type: number
+            format: float
+            nullable: true
+        - name: priceMax
+          in: query
+          schema:
+            type: number
+            format: float
+            nullable: true
+        - name: orderBy
+          in: query
+          schema:
+            type: string
+            enum: [id, amount, description, createdAt]
+            default: id
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+      responses:
+        '200':
+          description: Paginated list of expenses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedExpenses'
+    post:
+      tags: [Expense]
+      summary: Create a new expense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseDTO'
+      responses:
+        '201':
+          description: Expense created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '400':
+          description: Validation error
+
+  /api/expenses/{id}:
+    put:
+      tags: [Expense]
+      summary: Update an expense
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseDTO'
+      responses:
+        '200':
+          description: Expense updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '400':
+          description: Validation error
+        '404':
+          description: Expense not found
+    delete:
+      tags: [Expense]
+      summary: Delete an expense
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Successfully deleted
+        '404':
+          description: Expense not found
+
+  /api/expense-categories:
+    get:
+      tags: [Expense Category]
+      summary: List expense categories (paginated, sortable)
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: orderBy
+          in: query
+          schema:
+            type: string
+            enum: [id, name]
+            default: id
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+      responses:
+        '200':
+          description: Paginated list of categories
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCategories'
+    post:
+      tags: [Expense Category]
+      summary: Create a new category
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseCategoryDTO'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseCategory'
+        '400':
+          description: Validation error
+
+  /api/expense-categories/{id}:
+    put:
+      tags: [Expense Category]
+      summary: Update category
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseCategoryDTO'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseCategory'
+        '400':
+          description: Validation error
+        '404':
+          description: Not found
+    delete:
+      tags: [Expense Category]
+      summary: Delete category
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+
+components:
+  schemas:
+    BudgetResponse:
+      type: object
+      properties:
+        period:
+          type: string
+          example: currentQuarter
+        from:
+          type: string
+          format: date
+          example: 2025-10-01
+        to:
+          type: string
+          format: date
+          example: 2025-12-31
+        monthRange:
+          type: integer
+          example: 3
+        totalSpent:
+          type: number
+          format: float
+          example: 715.87
+        totalBudget:
+          type: number
+          format: float
+          example: 3000
+        percentageUsed:
+          type: number
+          format: float
+          example: 23.86
+
+    Meta:
+      type: object
+      properties:
+        lastPage:
+          type: integer
+          example: 2
+        count:
+          type: integer
+          example: 13
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 10
+
+    PaginatedExpenses:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/Meta'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Expense'
+
+    PaginatedCategories:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/Meta'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpenseCategory'
+
+    ExpenseDTO:
+      type: object
+      required: [categoryId, amount, description]
+      properties:
+        categoryId:
+          type: integer
+        amount:
+          type: number
+          format: float
+        description:
+          type: string
+
+    Expense:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 45
+        category:
+          $ref: '#/components/schemas/ExpenseCategory'
+        owner:
+          $ref: '#/components/schemas/ExpenseOwner'
+        amount:
+          type: number
+          format: float
+          example: 50.75
+        description:
+          type: string
+          example: Test expense creation
+
+    ExpenseCategoryDTO:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          example: Groceries
+
+    ExpenseCategory:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 35
+        name:
+          type: string
+          example: Groceries
+
+    ExpenseOwner:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 12
+        email:
+          type: string
+          example: test@example.com
+        name:
+          type: string
+          example: Test name
+
+    RegisterDTO:
+      type: object
+      required: [email, password, name]
+      properties:
+        email:
+          type: string
+          format: email
+          example: test@example.com
+        password:
+          type: string
+          example: secret123
+        name:
+          type: string
+          example: John Doe

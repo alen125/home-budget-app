@@ -1,0 +1,12 @@
+apis:
+  main:
+    root: ./openapi.yaml
+lint:
+  extends:
+    - recommended
+theme:
+  openapi:
+    theme:
+      colors:
+        primary:
+          main: "#0D47A1"

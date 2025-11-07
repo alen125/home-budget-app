@@ -1,0 +1,66 @@
+App\Entity\Expense:
+  expense_1_user_1:
+    owner: '@test_user_1'
+    category: '@category_groceries'
+    amount: 150.75
+    description: "Weekly grocery shopping"
+    createdAt: <(new DateTime())>
+    updatedAt: <(new DateTime())>
+
+  expense_2_user_1:
+    owner: '@test_user_1'
+    category: '@category_restaurants'
+    amount: 42.90
+    description: "Dinner at restaurant"
+    createdAt: <(new DateTime('-1 day'))>
+    updatedAt: <(new DateTime())>
+
+  expense_3_user_1:
+    owner: '@test_user_1'
+    category: '@category_utilities'
+    amount: 89.30
+    description: "Electricity bill"
+    createdAt: <(new DateTime('-3 days'))>
+    updatedAt: <(new DateTime())>
+
+  expense_4_user_1:
+    owner: '@test_user_1'
+    category: '@category_travel'
+    amount: 19.99
+    description: "Taxi ride"
+    createdAt: <(new DateTime('-2 days'))>
+    updatedAt: <(new DateTime())>
+
+  expense_5_user_1:
+    owner: '@test_user_1'
+    category: '@category_groceries'
+    amount: 75.10
+    description: "Extra groceries"
+    createdAt: <(new DateTime('-4 days'))>
+    updatedAt: <(new DateTime())>
+
+  expense_6_user_1:
+    owner: '@test_user_1'
+    category: '@category_travel'
+    amount: 230.00
+    description: "Weekend trip train ticket"
+    createdAt: <(new DateTime('-7 days'))>
+    updatedAt: <(new DateTime())>
+
+  # ---- Expenses for user 2 ----
+
+  expense_1_user_2:
+    owner: '@test_user_2'
+    category: '@category_restaurants'
+    amount: 31.60
+    description: "Lunch near office"
+    createdAt: <(new DateTime('-1 day'))>
+    updatedAt: <(new DateTime())>
+
+  expense_2_user_2:
+    owner: '@test_user_2'
+    category: '@category_travel'
+    amount: 120.00
+    description: "Fuel for weekend trip"
+    createdAt: <(new DateTime('-3 days'))>
+    updatedAt: <(new DateTime())>

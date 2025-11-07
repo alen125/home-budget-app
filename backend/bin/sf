@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker-compose exec symfony_php sh -c "./bin/console $*"

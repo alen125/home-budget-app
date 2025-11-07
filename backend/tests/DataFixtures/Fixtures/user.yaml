@@ -1,0 +1,16 @@
+App\Entity\User:
+  test_user_1:
+    email: "test@example.com"
+    roles: ["ROLE_USER"]
+    password: "<(password_hash('test123', PASSWORD_BCRYPT))>"
+    budget: 1000
+    createdAt: <(new DateTime())>
+    updatedAt: <(new DateTime())>
+
+  test_user_2:
+    email: "john.doe@example.com"
+    roles: [ "ROLE_USER" ]
+    password: "<(password_hash('test123', PASSWORD_BCRYPT))>"
+    budget: 1500
+    createdAt: <(new DateTime())>
+    updatedAt: <(new DateTime())>
